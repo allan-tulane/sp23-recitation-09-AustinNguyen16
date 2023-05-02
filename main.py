@@ -12,8 +12,24 @@ def shortest_shortest_path(graph, source):
       a dict where each key is a vertex and the value is a tuple of
       (shortest path weight, shortest path number of edges). See test case for example.
     """
-    ### TODO
-    pass
+    dist = {v: (float('inf'), float('inf')) for v in graph} 
+    dist[source] = (0, 0)
+    queue = [(0, 0, source)]
+    seen = set()
+    
+    while queue:
+        weight, edges, u = heappop(queue)
+        if u in seen:
+          continue
+        seen.add(u)
+        for v, w in graph[u]:
+            new_weight = weight + w
+            new_edges = edges + 1
+            if new_weight < dist[v][0] or (new_weight == dist[v][0] and new_edges < dist[v][1]):
+                dist[v] = (new_weight, new_edges)
+                heappush(queue, (new_weight, new_edges, v))
+    
+    return dist
     
 def test_shortest_shortest_path():
 
@@ -40,8 +56,16 @@ def bfs_path(graph, source):
       a dict where each key is a vertex and the value is the parent of 
       that vertex in the shortest path tree.
     """
-    ###TODO
-    pass
+    queue = deque([source])
+    parents = {source: None}
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph[node]:
+            if neighbor not in parents:
+                queue.append(neighbor)
+                parents[neighbor] = node
+    return parents
+
 
 def get_sample_graph():
      return {'s': {'a', 'b'},
@@ -65,10 +89,23 @@ def get_path(parents, destination):
       The shortest path from the source node to this destination node 
       (excluding the destination node itself). See test_get_path for an example.
     """
-    ###TODO
-    pass
+    path = []
+    current = destination
+    while current != None:
+      path.append(current)
+    return path
 
 def test_get_path():
     graph = get_sample_graph()
     parents = bfs_path(graph, 's')
     assert get_path(parents, 'd') == 'sbc'
+
+
+graph = {
+                's': {('a', 1), ('c', 4)},
+                'a': {('b', 2)}, # 'a': {'b'},
+                'b': {('c', 1), ('d', 4)}, 
+                'c': {('d', 3)},
+                'd': {},
+                'e': {('d', 0)}
+            }
